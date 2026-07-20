@@ -1,0 +1,59 @@
+<UserControl x:Class="QBTools.BimHUB.Controls.SignatureWatermark"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             IsHitTestVisible="False"
+             Focusable="False"
+             ClipToBounds="True">
+    <Viewbox Stretch="Fill"
+             StretchDirection="Both"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+        <Canvas Width="620" Height="760">
+            <Canvas.Resources>
+                <Style TargetType="Path">
+                    <Setter Property="Stroke" Value="#8ED7EE" />
+                    <Setter Property="StrokeThickness" Value="1.2" />
+                    <Setter Property="StrokeStartLineCap" Value="Round" />
+                    <Setter Property="StrokeEndLineCap" Value="Round" />
+                </Style>
+            </Canvas.Resources>
+
+            <Path Opacity="0.36" Data="M 28,734 C 150,510 354,405 616,438" />
+            <Path Opacity="0.30" Data="M 62,760 C 174,566 370,472 620,500" />
+            <Path Opacity="0.26" Data="M 124,760 C 224,614 394,544 620,556" />
+            <Path Opacity="0.24" Data="M 198,760 C 286,652 426,610 620,614" />
+            <Path Opacity="0.30" Data="M 18,620 C 182,586 332,620 468,744" />
+            <Path Opacity="0.24" Data="M 42,526 C 224,510 378,574 496,748" />
+            <Path Opacity="0.22" Data="M 104,430 C 280,438 420,538 522,750" />
+
+            <Path Opacity="0.25"
+                  StrokeDashArray="3,5"
+                  Data="M 96,214 L 96,706 M 210,152 L 210,718 M 334,108 L 334,728 M 458,78 L 458,742 M 570,62 L 570,750" />
+            <Path Opacity="0.22"
+                  StrokeDashArray="3,5"
+                  Data="M 72,288 L 598,288 M 48,402 L 608,402 M 28,516 L 616,516 M 18,630 L 620,630" />
+
+            <Path StrokeThickness="2"
+                  Opacity="0.50"
+                  Data="M 478,748 C 470,654 454,570 430,492 C 411,428 407,362 430,296" />
+            <Path StrokeThickness="1.5"
+                  Opacity="0.46"
+                  Data="M 441,538 C 398,490 364,455 318,438 M 428,482 C 462,430 492,394 536,374 M 421,420 C 380,382 350,344 336,300 M 424,356 C 466,322 494,284 506,244" />
+
+            <Path Opacity="0.50" Data="M 318,438 C 344,408 380,410 397,446 C 366,458 338,456 318,438 Z" />
+            <Path Opacity="0.48" Data="M 536,374 C 508,350 478,358 462,392 C 490,400 516,392 536,374 Z" />
+            <Path Opacity="0.48" Data="M 336,300 C 362,280 390,290 402,322 C 376,326 352,318 336,300 Z" />
+            <Path Opacity="0.46" Data="M 506,244 C 478,224 452,236 444,268 C 470,270 492,260 506,244 Z" />
+            <Path Opacity="0.44" Data="M 430,296 C 404,268 406,236 434,214 C 452,244 450,272 430,296 Z" />
+
+            <Ellipse Canvas.Left="468" Canvas.Top="738" Width="18" Height="18"
+                     Stroke="#8ED7EE" StrokeThickness="1.4" Opacity="0.46" />
+            <Ellipse Canvas.Left="202" Canvas.Top="710" Width="9" Height="9"
+                     Fill="#8ED7EE" Opacity="0.30" />
+            <Ellipse Canvas.Left="326" Canvas.Top="664" Width="10" Height="10"
+                     Stroke="#8ED7EE" StrokeThickness="1.2" Opacity="0.34" />
+            <Ellipse Canvas.Left="548" Canvas.Top="554" Width="9" Height="9"
+                     Fill="#8ED7EE" Opacity="0.28" />
+        </Canvas>
+    </Viewbox>
+</UserControl>

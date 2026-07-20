@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(RevitVersion)' == '2023' or '$(RevitVersion)' == '2024'">net48</TargetFramework>
+    <TargetFramework Condition="'$(RevitVersion)' != '2023' and '$(RevitVersion)' != '2024'">net8.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms Condition="'$(TargetFramework)' == 'net48'">true</UseWindowsForms>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>QBTools.BimHUB</AssemblyName>
+    <RootNamespace>QBTools.BimHUB</RootNamespace>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2025</RevitVersion>
+    <RevitInstallDirectory>C:\Program Files\Autodesk\Revit $(RevitVersion)</RevitInstallDirectory>
+    <OutputPath>bin\$(Configuration)\Revit$(RevitVersion)\</OutputPath>
+    <IntermediateOutputPath>obj\Revit$(RevitVersion)\$(Configuration)\</IntermediateOutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\BimHUB-16.png" />
+    <Resource Include="Assets\BimHUB-32.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0">
+      <IncludeAssets>compile</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48"
+                      Version="1.0.3"
+                      PrivateAssets="all"
+                      Condition="'$(TargetFramework)' == 'net48'" />
+    <PackageReference Include="System.Text.Json"
+                      Version="8.0.5"
+                      Condition="'$(TargetFramework)' == 'net48'" />
+    <Reference Include="RevitAPI">
+      <HintPath>$(RevitInstallDirectory)\RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(RevitInstallDirectory)\RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="ValidateRevitVersion" BeforeTargets="ResolveAssemblyReferences">
+    <Error
+      Condition="'$(RevitVersion)' != '2023' and '$(RevitVersion)' != '2024' and '$(RevitVersion)' != '2025' and '$(RevitVersion)' != '2026' and '$(RevitVersion)' != '2027'"
+      Text="RevitVersion must be between 2023 and 2027." />
+    <Error
+      Condition="!Exists('$(RevitInstallDirectory)\RevitAPI.dll') or !Exists('$(RevitInstallDirectory)\RevitAPIUI.dll')"
+      Text="Revit $(RevitVersion) API assemblies were not found in $(RevitInstallDirectory)." />
+  </Target>
+
+</Project>

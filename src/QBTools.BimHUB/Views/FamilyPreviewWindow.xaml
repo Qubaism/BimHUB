@@ -1,0 +1,129 @@
+<Window x:Class="QBTools.BimHUB.Views.FamilyPreviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:QBTools.BimHUB.Converters"
+        Title="BimHUB preview"
+        Width="900" Height="700" MinWidth="520" MinHeight="420"
+        WindowStartupLocation="CenterOwner" Background="#FFFFFF"
+        KeyDown="Window_KeyDown"
+        SizeChanged="FamilyPreviewWindow_SizeChanged">
+    <Window.Resources>
+        <converters:ThumbnailPathConverter x:Key="ThumbnailPathConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Margin="12" Background="#EAF0F3" BorderBrush="#D0DBE1" BorderThickness="1">
+            <ScrollViewer x:Name="PreviewScrollViewer"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          PreviewMouseWheel="PreviewScrollViewer_PreviewMouseWheel">
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Background="#FFFFFF">
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="15" FontWeight="SemiBold" Foreground="#819099" Text="No preview" />
+                    <Image x:Name="PreviewImage"
+                           Source="{Binding ThumbnailPath, Converter={StaticResource ThumbnailPathConverter}}"
+                           Stretch="None" SnapsToDevicePixels="True">
+                        <Image.LayoutTransform>
+                            <ScaleTransform x:Name="ImageScaleTransform" ScaleX="1" ScaleY="1" />
+                        </Image.LayoutTransform>
+                    </Image>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+
+        <Border Grid.Row="1" Padding="18,14,18,16" Background="#FFFFFF"
+                BorderBrush="#D6E0E6" BorderThickness="0,1,0,0">
+            <StackPanel>
+                <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="#17242B"
+                           Text="{Binding Name}" TextWrapping="Wrap" />
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="#6A7880"
+                               Text="Category" />
+                    <TextBlock Grid.Column="1" Margin="8,0,20,0" FontSize="12" Foreground="#334750">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="{Binding DisplayCategory}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding DisplayCategory}" Value="">
+                                        <Setter Property="Text" Value="Not available" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold" Foreground="#6A7880"
+                               Text="{Binding MetadataLabel}" />
+                    <TextBlock Grid.Column="3" Margin="8,0,0,0" FontSize="12" Foreground="#334750"
+                               Text="{Binding FileSize}" />
+                </Grid>
+                <StackPanel Margin="0,12,0,0">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SupportsTypes}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="0,0,0,6" FontSize="11" FontWeight="SemiBold"
+                               Foreground="#6A7880" Text="Available types" />
+                    <TextBlock FontSize="11" Foreground="#6A7880"
+                               Text="Available after this family is loaded">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasTypes}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <ScrollViewer MaxHeight="94" VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ScrollViewer.Style>
+                            <Style TargetType="ScrollViewer">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasTypes}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ScrollViewer.Style>
+                        <ItemsControl ItemsSource="{Binding TypeNames}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,6,6" Padding="7,3" Background="#F1F5F7"
+                                            BorderBrush="#D5E0E5" BorderThickness="1" CornerRadius="2">
+                                        <TextBlock MaxWidth="260" FontSize="11" Foreground="#334750"
+                                                   Text="{Binding}" TextTrimming="CharacterEllipsis" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

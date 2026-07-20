@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>BimHUB</Name>
+    <Assembly>{{ASSEMBLY_PATH}}</Assembly>
+    <AddInId>830DF0C2-7562-4041-A65C-00C189748996</AddInId>
+    <FullClassName>QBTools.BimHUB.BimHubApplication</FullClassName>
+    <VendorId>QBTS</VendorId>
+    <VendorDescription>QBTools</VendorDescription>
+  </AddIn>
+</RevitAddIns>

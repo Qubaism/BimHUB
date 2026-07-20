@@ -1,0 +1,422 @@
+<Page x:Class="QBTools.BimHUB.Views.BimHubPane"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="clr-namespace:QBTools.BimHUB.Controls"
+      xmlns:converters="clr-namespace:QBTools.BimHUB.Converters"
+      Title="Library" MinWidth="260" MinHeight="240" Background="#FFFFFF">
+    <Page.Resources>
+        <converters:ThumbnailPathConverter x:Key="ThumbnailPathConverter" />
+        <converters:FolderNameConverter x:Key="FolderNameConverter" />
+        <converters:FolderNumberConverter x:Key="FolderNumberConverter" />
+
+        <Style x:Key="CompactFolderListStyle" TargetType="ListBox">
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="AlternationCount" Value="1000" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        </Style>
+
+        <Style x:Key="CompactFolderItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="3,2" />
+            <Setter Property="Margin" Value="0,0,0,1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E1F0F5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="#31424D" />
+            <Setter Property="Background" Value="#F8FBFC" />
+            <Setter Property="BorderBrush" Value="#C8D7E1" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#E7F3F7" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#6EA9C3" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FavoriteButtonStyle" TargetType="Button" BasedOn="{StaticResource IconButtonStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                    <Setter Property="Foreground" Value="#14765A" />
+                    <Setter Property="Background" Value="#E4F3EE" />
+                    <Setter Property="BorderBrush" Value="#64A891" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Background" Value="#24785F" />
+            <Setter Property="BorderBrush" Value="#1D674F" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#B9C8D1" />
+            <Setter Property="Foreground" Value="#30383F" />
+        </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="MinWidth" Value="72" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#56616B" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabBorder" Padding="{TemplateBinding Padding}"
+                                Background="Transparent" BorderBrush="Transparent" BorderThickness="0,0,0,2">
+                            <ContentPresenter HorizontalAlignment="Center" ContentSource="Header" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="#EAF4F0" />
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#258263" />
+                                <Setter Property="Foreground" Value="#185F4B" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="MainTabStyle" TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+            <Setter Property="MinWidth" Value="58" />
+            <Setter Property="Padding" Value="6,10" />
+        </Style>
+
+        <DataTemplate x:Key="ListCardTemplate">
+            <Border Margin="6,4" Padding="8" Background="#F7FFFFFF" BorderBrush="#CAD8E1"
+                    BorderThickness="1" CornerRadius="4" MouseLeftButtonDown="Card_MouseLeftButtonDown"
+                    MouseMove="Card_MouseMove">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="64" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="64" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="56" Height="56" Background="#E9EFF2" CornerRadius="2">
+                        <Grid>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"
+                                       FontWeight="Bold" Foreground="#71818A" Text="{Binding FallbackLabel}" />
+                            <Image Source="{Binding ThumbnailPath, Converter={StaticResource ThumbnailPathConverter}, ConverterParameter=256}"
+                                   Stretch="Uniform" />
+                        </Grid>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="8,1" VerticalAlignment="Center">
+                        <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="#1F2B32"
+                                   Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding FullPath}" />
+                        <TextBlock Margin="0,3,0,0" FontSize="10" Foreground="#52636D"
+                                   Text="{Binding DisplayCategory}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Margin="0,2,0,0" FontSize="10" Foreground="#7A878E"
+                                   Text="{Binding FileSize}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Margin="0,0,5,0" Content="&#xE890;" Click="PreviewButton_Click"
+                                Style="{StaticResource IconButtonStyle}" ToolTip="Preview content" />
+                        <Button Content="&#xE734;" Click="FavoriteButton_Click"
+                                Style="{StaticResource FavoriteButtonStyle}" ToolTip="Toggle favorite" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GridCardTemplate">
+            <Border Height="194" Padding="7" Background="#F7FFFFFF"
+                    BorderBrush="#CAD8E1" BorderThickness="1" CornerRadius="4"
+                    MouseLeftButtonDown="Card_MouseLeftButtonDown" MouseMove="Card_MouseMove">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="108" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Border Background="#E9EFF2" CornerRadius="2">
+                        <Grid>
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12"
+                                       FontWeight="Bold" Foreground="#71818A" Text="{Binding FallbackLabel}" />
+                            <Image Source="{Binding ThumbnailPath, Converter={StaticResource ThumbnailPathConverter}, ConverterParameter=256}"
+                                   Stretch="Uniform" />
+                            <Button Margin="4" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    Content="&#xE890;" Click="PreviewButton_Click"
+                                    Style="{StaticResource IconButtonStyle}" ToolTip="Preview content" />
+                            <Button Margin="4" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Content="&#xE734;" Click="FavoriteButton_Click"
+                                    Style="{StaticResource FavoriteButtonStyle}" ToolTip="Toggle favorite" />
+                        </Grid>
+                    </Border>
+                    <StackPanel Grid.Row="1" Margin="1,7,1,0">
+                        <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="#1F2B32"
+                                   Text="{Binding Name}" TextWrapping="Wrap" MaxHeight="32" ToolTip="{Binding FullPath}" />
+                        <TextBlock Margin="0,4,0,0" FontSize="10" Foreground="#52636D"
+                                   Text="{Binding DisplayCategory}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Margin="0,2,0,0" FontSize="9" Foreground="#7A878E"
+                                   Text="{Binding FileSize}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="56" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="28" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="#242A30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4" /><ColumnDefinition Width="*" /><ColumnDefinition Width="42" />
+            </Grid.ColumnDefinitions>
+            <Border Background="#2FA77A" />
+            <StackPanel Grid.Column="1" Margin="14,8">
+                <TextBlock FontSize="10" Foreground="#B8C1C8" Text="QBTools" />
+                <TextBlock Margin="0,1,0,0" FontSize="18" FontWeight="SemiBold" Foreground="#FFFFFF" Text="BimHUB" />
+            </StackPanel>
+            <Button x:Name="MoreButton" Grid.Column="2" Width="34" Height="34" Click="MoreButton_Click"
+                    FontSize="18" FontWeight="Bold" Foreground="#DCE3E7" Background="Transparent"
+                    BorderThickness="0" Content="..." ToolTip="More options">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Library settings" Click="LibrarySettingsMenuItem_Click" />
+                        <Separator />
+                        <MenuItem x:Name="RefreshLibraryMenuItem" Header="Refresh library" Click="RefreshLibraryMenuItem_Click" />
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="1" Background="#FFFFFF">
+            <Grid x:Name="BrowserView">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TabControl x:Name="MainTabs" Grid.Row="0" BorderThickness="0" Background="Transparent"
+                            ItemContainerStyle="{StaticResource MainTabStyle}"
+                            SelectionChanged="MainTabs_SelectionChanged">
+                    <TabItem Header="Families" /><TabItem Header="Details" />
+                    <TabItem Header="Favorites" /><TabItem Header="Recent" />
+                </TabControl>
+
+                <Border Grid.Row="1" Padding="8" Background="#F5F8FA" BorderBrush="#D9E2E7" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="36" /><RowDefinition Height="38" /></Grid.RowDefinitions>
+                        <TabControl x:Name="DetailTabs" Margin="0,0,0,5" SelectedIndex="0"
+                                    Visibility="Collapsed" BorderThickness="0" Background="Transparent"
+                                    SelectionChanged="DetailTabs_SelectionChanged">
+                            <TabItem Header="Drafting views" />
+                            <TabItem Header="Drafting sheets" />
+                        </TabControl>
+                        <TabControl x:Name="FavoriteTabs" Margin="0,0,0,5" SelectedIndex="0"
+                                    Visibility="Collapsed" BorderThickness="0" Background="Transparent"
+                                    SelectionChanged="FavoriteTabs_SelectionChanged">
+                            <TabItem Header="Families" />
+                            <TabItem Header="Drafting views" />
+                            <TabItem Header="Drafting sheets" />
+                        </TabControl>
+                        <Grid Grid.Row="1">
+                            <TextBlock Panel.ZIndex="1" Margin="10,0,0,0" VerticalAlignment="Center"
+                                       IsHitTestVisible="False" FontFamily="Segoe MDL2 Assets"
+                                       Foreground="#6C8594" Text="&#xE721;" />
+                            <TextBox x:Name="SearchTextBox" Padding="31,8,10,7" Background="#FFFFFF"
+                                     BorderBrush="#C8D7E1" BorderThickness="1" TextChanged="SearchTextBox_TextChanged"
+                                     ToolTip="Search library content" />
+                        </Grid>
+                        <Grid Grid.Row="2" Margin="0,7,0,0">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <TextBlock Margin="2,0,8,0" VerticalAlignment="Center" FontSize="11" Foreground="#42515A" Text="Category" />
+                            <ComboBox x:Name="CategoryComboBox" Grid.Column="1" MinWidth="110" Height="28"
+                                      SelectionChanged="CategoryComboBox_SelectionChanged" />
+                            <StackPanel Grid.Column="2" Margin="8,0,0,0" Orientation="Horizontal">
+                                <Button x:Name="ListLayoutButton" Margin="0,0,4,0" Content="&#xEA37;" Click="ListLayoutButton_Click"
+                                        Style="{StaticResource IconButtonStyle}" ToolTip="List layout" />
+                                <Button x:Name="GridLayoutButton" Content="&#xE80A;" Click="GridLayoutButton_Click"
+                                        Style="{StaticResource IconButtonStyle}" ToolTip="Grid layout" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="2">
+                    <controls:SignatureWatermark Panel.ZIndex="0" Opacity="0.38" />
+                    <StackPanel x:Name="LibraryEmptyState" Panel.ZIndex="1" MaxWidth="280" Margin="24"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock x:Name="EmptyStateTitleText" HorizontalAlignment="Center" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="#2C343B" Text="No families to show" />
+                        <TextBlock x:Name="LibraryMessageText" Margin="0,6,0,0" HorizontalAlignment="Center"
+                                   FontSize="11" Foreground="#6B747C" TextAlignment="Center" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ListBox x:Name="FamilyList" Panel.ZIndex="1" Visibility="Collapsed" BorderThickness="0" Background="#DFFFFFFF"
+                             ItemTemplate="{StaticResource ListCardTemplate}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.CanContentScroll="True"
+                             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                             PreviewMouseDoubleClick="FamilyItems_PreviewMouseDoubleClick">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="0" /><Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    <ListBox x:Name="FamilyGrid" Panel.ZIndex="1" Visibility="Collapsed" BorderThickness="0" Background="#DFFFFFFF"
+                             ItemTemplate="{StaticResource GridCardTemplate}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.CanContentScroll="True"
+                             VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                             Padding="6" PreviewMouseDoubleClick="FamilyItems_PreviewMouseDoubleClick">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:AdaptiveGridPanel MinimumItemWidth="112" ItemHeight="194" Spacing="8" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Grid>
+
+            </Grid>
+
+            <Grid x:Name="SettingsView" Visibility="Collapsed" Background="#FAFFFFFF">
+                <Grid.RowDefinitions><RowDefinition Height="44" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                <Border Background="#F4F7F8" BorderBrush="#D9E2E7" BorderThickness="0,0,0,1">
+                    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="44" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <Button Margin="7" Padding="0" Click="BackToLibraryButton_Click" Content="&lt;"
+                                Style="{StaticResource SecondaryButtonStyle}" ToolTip="Back to library" />
+                        <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="14" FontWeight="SemiBold" Text="Library settings" />
+                    </Grid>
+                </Border>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                  <StackPanel Margin="12,10">
+                    <TextBlock FontSize="12" FontWeight="SemiBold" Text="Revit family folders" />
+                    <WrapPanel Margin="0,6,0,0">
+                        <Button Margin="0,0,5,3" Content="Add folder" Click="ChooseFolderButton_Click" Style="{StaticResource PrimaryButtonStyle}" />
+                        <Button x:Name="OpenSelectedFolderButton" Margin="0,0,5,3" Content="Open selected" Click="OpenSelectedFolderButton_Click"
+                                IsEnabled="False" Style="{StaticResource SecondaryButtonStyle}" />
+                        <Button x:Name="RemoveLibraryFolderButton" Margin="0,0,5,3" Content="Remove selected" Click="RemoveLibraryFolderButton_Click"
+                                IsEnabled="False" Style="{StaticResource SecondaryButtonStyle}" />
+                    </WrapPanel>
+                    <ListBox x:Name="LibraryRootsList"
+                             SelectionChanged="LibraryRootsList_SelectionChanged"
+                             Style="{StaticResource CompactFolderListStyle}"
+                             ItemContainerStyle="{StaticResource CompactFolderItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ToolTip="{Binding}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource FolderNumberConverter}}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Converter={StaticResource FolderNameConverter}}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock x:Name="SettingsStatusText" Margin="3,2,0,0" FontSize="10"
+                               Foreground="#6B747C" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,8,0,0" FontSize="11" FontWeight="SemiBold" Text="Thumbnail cache" />
+                    <TextBlock Margin="0,2,0,0" FontSize="10" Foreground="#6B747C"
+                               Text="_ThumbnailCache\FamilyName.png" />
+                    <WrapPanel Margin="0,6,0,0">
+                        <Button x:Name="GenerateMissingThumbnailsButton" Margin="0,0,5,3"
+                                Content="Generate thumbnails" Click="GenerateMissingThumbnailsButton_Click"
+                                Style="{StaticResource PrimaryButtonStyle}" />
+                        <Button x:Name="StopThumbnailGenerationButton" Margin="0,0,5,3"
+                                Content="Stop" Click="StopThumbnailGenerationButton_Click"
+                                IsEnabled="False" Style="{StaticResource SecondaryButtonStyle}" />
+                    </WrapPanel>
+                    <TextBlock x:Name="ThumbnailProgressText" Margin="0,1,0,0" FontSize="10"
+                               Foreground="#6B747C" Text="No thumbnail task running." TextWrapping="Wrap" />
+                    <Separator Margin="0,9,0,9" />
+                    <TextBlock FontSize="12" FontWeight="SemiBold" Text="Details folders" />
+                    <WrapPanel Margin="0,6,0,0">
+                        <Button Margin="0,0,5,3" Content="Add folder" Click="ChooseDetailsFolderButton_Click" Style="{StaticResource PrimaryButtonStyle}" />
+                        <Button x:Name="OpenSelectedDetailsFolderButton" Margin="0,0,5,3" Content="Open selected" Click="OpenSelectedDetailsFolderButton_Click"
+                                IsEnabled="False" Style="{StaticResource SecondaryButtonStyle}" />
+                        <Button x:Name="RemoveDetailsFolderButton" Margin="0,0,5,3" Content="Remove selected" Click="RemoveDetailsFolderButton_Click"
+                                IsEnabled="False" Style="{StaticResource SecondaryButtonStyle}" />
+                    </WrapPanel>
+                    <ListBox x:Name="DetailsRootsList"
+                             SelectionChanged="DetailsRootsList_SelectionChanged"
+                             Style="{StaticResource CompactFolderListStyle}"
+                             ItemContainerStyle="{StaticResource CompactFolderItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ToolTip="{Binding}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource FolderNumberConverter}}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Converter={StaticResource FolderNameConverter}}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock x:Name="DetailsFoldersStatusText" Margin="3,2,0,0" FontSize="10"
+                               Foreground="#6B747C" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,8,0,0" FontSize="11" FontWeight="SemiBold" Text="Drafting-view categories" />
+                    <TextBlock Margin="0,4,0,2" FontSize="10" Foreground="#42515A"
+                               Text="Category parameter name" />
+                    <TextBox x:Name="DetailCategoryParameterNameTextBox" Height="27" Padding="6,3"
+                             LostFocus="DetailCategoryParameterNameTextBox_LostFocus" />
+                    <TextBlock Margin="0,4,0,0" FontSize="10" Foreground="#6B747C" TextWrapping="Wrap"
+                               Text="In each details Revit file, add the same parameter to drafting views or sheets. Enter its name here so BimHUB can read it and filter details by category." />
+                    <WrapPanel Margin="0,7,0,0">
+                        <Button x:Name="RefreshDraftingViewsButton" Margin="0,0,5,3"
+                                Content="Refresh details" Click="RefreshDraftingViewsButton_Click"
+                                Style="{StaticResource PrimaryButtonStyle}" />
+                        <Button x:Name="StopDraftingRefreshButton" Margin="0,0,5,3"
+                                Content="Stop" Click="StopDraftingRefreshButton_Click"
+                                IsEnabled="False" Style="{StaticResource SecondaryButtonStyle}" />
+                    </WrapPanel>
+                  </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#F3F5F6" BorderBrush="#DDE2E5" BorderThickness="0,1,0,0">
+            <Grid Margin="10,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" VerticalAlignment="Center" FontSize="10" Foreground="#5E6870" Text="Ready" />
+                <TextBlock x:Name="ItemCountText" Grid.Column="1" VerticalAlignment="Center" FontSize="10" Foreground="#5E6870" Text="0 items" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

@@ -15,8 +15,10 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $projectPath = Join-Path $repositoryRoot 'src\QBTools.BimHUB\QBTools.BimHUB.csproj'
 $testProjectPath = Join-Path $repositoryRoot 'tests\QBTools.BimHUB.Tests\QBTools.BimHUB.Tests.csproj'
 $installerScriptPath = Join-Path $repositoryRoot 'installer\BimHUB.iss'
+$packageReadmePath = Join-Path $repositoryRoot 'installer\Package-README.txt'
 $artifactsRoot = Join-Path $repositoryRoot 'artifacts'
 $stagingRoot = Join-Path $artifactsRoot 'installer-staging'
+$packageStagingRoot = Join-Path $artifactsRoot 'installer-package'
 $outputRoot = Join-Path $artifactsRoot 'installer'
 $supportedVersions = @('2023', '2024', '2025', '2026')
 
@@ -45,7 +47,7 @@ if ($numericParts.Count -ne 4 -or
     throw 'NumericVersion must contain four values between 0 and 65535.'
 }
 
-foreach ($path in @($stagingRoot, $outputRoot)) {
+foreach ($path in @($stagingRoot, $packageStagingRoot, $outputRoot)) {
     Assert-RepositoryChildPath $path
     if (Test-Path -LiteralPath $path) {
         Remove-Item -LiteralPath $path -Recurse -Force
@@ -140,7 +142,15 @@ $hash = Get-FileHash -LiteralPath $installerPath -Algorithm SHA256
 $hashPath = "$installerPath.sha256"
 Set-Content -LiteralPath $hashPath -Value "$($hash.Hash.ToLowerInvariant())  $([System.IO.Path]::GetFileName($installerPath))" -Encoding ascii
 
+$packagePath = Join-Path $outputRoot 'BimHUB-0.1.0-Windows.zip'
+Copy-Item -LiteralPath $installerPath -Destination $packageStagingRoot -Force
+Copy-Item -LiteralPath $hashPath -Destination $packageStagingRoot -Force
+Copy-Item -LiteralPath $packageReadmePath -Destination (Join-Path $packageStagingRoot 'README.txt') -Force
+Copy-Item -LiteralPath (Join-Path $repositoryRoot 'LICENSE') -Destination (Join-Path $packageStagingRoot 'LICENSE.txt') -Force
+Compress-Archive -Path (Join-Path $packageStagingRoot '*') -DestinationPath $packagePath -CompressionLevel Optimal -Force
+
 Write-Host ''
 Write-Host 'Installer created successfully.'
 Write-Host "Installer: $installerPath"
+Write-Host "Package:   $packagePath"
 Write-Host "SHA256:   $($hash.Hash.ToLowerInvariant())"

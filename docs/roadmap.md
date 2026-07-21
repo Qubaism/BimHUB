@@ -38,13 +38,13 @@ The current development build provides the main product foundation:
 - Confirm settings, favorites, and recent items survive Revit restarts
 - Expand automated tests around catalog, filtering, cache, and import preparation logic
 
-## First Public Release
+## Release Readiness
 
 - Define the first release feature set
-- Prepare a signed installer
-- Add installation, update, and removal guidance
+- Continue testing the per-user installer across clean and upgraded systems
+- Digitally sign production installers
 - Complete final regression testing
-- Publish a versioned GitHub release
+- Publish versioned GitHub releases with installer checksums
 
 ## Future Possibilities
 

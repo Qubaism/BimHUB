@@ -1,8 +1,8 @@
 # BimHUB
 
-BimHUB will be a Revit add-in by QBTools. It will provide a dockable panel for browsing, searching, previewing, and inserting BIM library content from organized local or shared libraries directly into a Revit project.
+BimHUB is a Revit add-in by QBTools. It provides a dockable panel for browsing, searching, previewing, and inserting BIM library content from organized local or shared libraries directly into a Revit project.
 
-The goal of BimHUB is to make reusable BIM content easier to find, understand, and place in Autodesk Revit. Instead of manually browsing folders or relying on memory, users will be able to search a structured library, preview available content, and insert the right item into the active Revit project with confidence.
+The goal of BimHUB is to make reusable BIM content easier to find, understand, and place in Autodesk Revit. Instead of manually browsing folders or relying on memory, users can search a structured library, preview available content, and insert the right item into the active Revit project with confidence.
 
 ## Who This Is For
 
@@ -46,6 +46,19 @@ BimHUB only opens source content that matches the active Revit version. Source f
 
 Revit 2023 through Revit 2026 have been validated individually. Compatibility will continue to be checked before each public release.
 
+## Installation
+
+1. Close all Autodesk Revit windows.
+2. Download the latest `BimHUB-*-Setup.exe` and its `.sha256` file from [GitHub Releases](https://github.com/Qubaism/BimHUB/releases).
+3. Run the installer and select the detected Revit versions where BimHUB should be installed.
+4. Start Revit and open BimHUB from the **QBTools** ribbon panel.
+
+The installer supports Revit 2023 through Revit 2026, installs only for the current Windows user, and does not require administrator access. It appears as **BimHUB by QBTools** in Windows **Installed apps**.
+
+Alpha installers are not currently code-signed, so Windows may display **Unknown Publisher**. Verify the downloaded installer against the SHA-256 value included with the release before running it.
+
+To repair BimHUB, close Revit and run the same installer again. To upgrade, run the newer installer. To remove BimHUB, use Windows **Installed apps**. Uninstalling the add-in does not remove BimHUB library settings, thumbnails, or catalog caches.
+
 ## Product Goals
 
 - Make reusable Revit content fast to find and preview
@@ -57,15 +70,14 @@ Revit 2023 through Revit 2026 have been validated individually. Compatibility wi
 
 ## Project Status
 
-BimHUB is under active development. The source code is available for review, but no public installer or production-ready release is available yet.
+BimHUB is under active development and available as a public alpha. The current installer supports per-user installation, repair, upgrade, and uninstall for detected Revit 2023 through Revit 2026 installations.
 
-Before the first release, the project will require:
+Before a production-ready release, the project will require:
 
 - Continued regression testing across supported Revit versions
 - Additional stability and performance testing with larger libraries
-- Installation and update packaging
-- User installation guidance
-- A versioned GitHub release
+- Installer code signing
+- Continued testing of installation, repair, upgrade, and uninstall workflows
 
 See the [product roadmap](docs/roadmap.md) for the current development direction.
 

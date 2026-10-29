@@ -1,0 +1,67 @@
+name: Feature request
+description: Suggest an improvement to a BimHUB workflow.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the BIM or Revit workflow first. This helps evaluate the request based on the problem it should solve.
+
+        Do not include confidential projects, library paths, screenshots, or company information.
+
+  - type: textarea
+    id: workflow-problem
+    attributes:
+      label: What workflow problem should this solve?
+      description: Explain the current BIM or Revit task and why it is difficult or repetitive.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed improvement
+      description: Describe how you would like BimHUB to improve this workflow.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: content-area
+    attributes:
+      label: BimHUB area
+      options:
+        - Families
+        - Drafting views
+        - Drafting sheets
+        - Search and filtering
+        - Favorites or recent items
+        - Library settings
+        - Installation or updates
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: revit-versions
+    attributes:
+      label: Relevant Revit versions
+      description: Enter all affected versions, or write "All supported versions".
+      placeholder: All supported versions
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: Add safe examples, sketches, or non-confidential screenshots if useful.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues for a similar request.
+          required: true
+        - label: I removed confidential or company information from this request and its attachments.
+          required: true

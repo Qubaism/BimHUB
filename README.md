@@ -2,7 +2,7 @@
 
 [![Download BimHUB for Windows](https://img.shields.io/badge/Download-BimHUB%20for%20Windows-0078D4?style=flat-square&logo=windows11&logoColor=white)](https://github.com/Qubaism/BimHUB/releases/download/v0.1.0-alpha.2/BimHUB-0.1.0-Windows.zip)
 [![Release](https://img.shields.io/github/v/release/Qubaism/BimHUB?include_prereleases&style=flat-square&label=release)](https://github.com/Qubaism/BimHUB/releases)
-[![Revit 2023-2026](https://img.shields.io/badge/Revit-2023--2026-0696D7?style=flat-square)](#revit-compatibility)
+[![Revit 2023-2027](https://img.shields.io/badge/Revit-2023--2027-0696D7?style=flat-square)](#revit-compatibility)
 [![GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-2E7D32?style=flat-square)](LICENSE)
 
 BimHUB is a Revit add-in by QBTools. It provides a dockable panel for browsing, searching, previewing, and inserting BIM library content from organized local or shared libraries directly into a Revit project.
@@ -47,13 +47,15 @@ BimHUB only opens source content that matches the active Revit version. Source f
 
 | Revit version | Build target | Current status |
 |---|---|---|
-| Revit 2023 | .NET Framework 4.8 | Build, automated tests, and in-Revit testing pass |
-| Revit 2024 | .NET Framework 4.8 | Build, automated tests, and in-Revit testing pass |
-| Revit 2025 | .NET 8 | Build, automated tests, and in-Revit testing pass |
-| Revit 2026 | .NET 8 | Build, automated tests, and in-Revit testing pass |
-| Revit 2027 | .NET 8 configuration | Requires the Revit 2027 API before it can be built and verified |
+| Revit 2023 | .NET Framework 4.8 | Previously tested in Revit; refreshed build verification pending |
+| Revit 2024 | .NET Framework 4.8 | Build and automated tests pass; live retest pending |
+| Revit 2025 through 2025.4 | .NET 8 | Build and automated tests pass; live retest pending |
+| Revit 2025.5 and later | .NET 10 | Build and live verification pending on a matching installation |
+| Revit 2026 through 2026.4 | .NET 8 | Previously tested in Revit; refreshed build verification pending |
+| Revit 2026.5 and later | .NET 10 | Build and automated tests pass; live test pending |
+| Revit 2027 | .NET 10 | Build and automated tests pass; live test pending |
 
-Revit 2023 through Revit 2026 have been validated individually. Compatibility will continue to be checked before each public release.
+Revit 2025.5 and Revit 2026.5 changed from .NET 8 to .NET 10. BimHUB therefore provides separate payloads for Revit installations on either side of those updates. The installer reads the installed Revit build and selects the matching payload automatically.
 
 ## Installation
 
@@ -62,7 +64,7 @@ Revit 2023 through Revit 2026 have been validated individually. Compatibility wi
 3. Run `BimHUB-*-Setup.exe` and select the detected Revit versions where BimHUB should be installed.
 4. Start Revit and open BimHUB from the **QBTools** ribbon panel.
 
-The installer supports Revit 2023 through Revit 2026, installs only for the current Windows user, and does not require administrator access. It appears as **BimHUB by QBTools** in Windows **Installed apps**.
+The development installer supports Revit 2023 through Revit 2027, including the .NET 8/.NET 10 transition in Revit 2025 and 2026. It installs only for the current Windows user and does not require administrator access. It appears as **BimHUB by QBTools** in Windows **Installed apps**.
 
 Alpha installers are not currently code-signed, so Windows may display **Unknown Publisher**. Verify the downloaded installer against the SHA-256 value included with the release before running it.
 
@@ -79,7 +81,7 @@ To repair BimHUB, close Revit and run the same installer again. To upgrade, run 
 
 ## Project Status
 
-BimHUB is under active development and available as a public alpha. The current installer supports per-user installation, repair, upgrade, and uninstall for detected Revit 2023 through Revit 2026 installations.
+BimHUB is under active development and available as a public alpha. The next installer supports per-user installation, repair, upgrade, and uninstall for compatible Revit 2023 through Revit 2027 installations and automatically selects the required .NET runtime payload.
 
 Before a production-ready release, the project will require:
 

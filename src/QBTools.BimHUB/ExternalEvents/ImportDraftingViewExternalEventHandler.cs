@@ -61,6 +61,7 @@ public sealed class ImportDraftingViewExternalEventHandler : IExternalEventHandl
             using (var transaction = new Transaction(targetDocument, "Import drafting view from BimHUB"))
             {
                 transaction.Start();
+                ImportFailureHandling.ApplyQuietRollback(transaction);
                 var conflictHandler = new DuplicateTypeConflictHandler();
                 var copyOptions = new CopyPasteOptions();
                 copyOptions.SetDuplicateTypeNamesHandler(conflictHandler);
@@ -69,8 +70,17 @@ public sealed class ImportDraftingViewExternalEventHandler : IExternalEventHandl
                     sourceView,
                     targetDocument,
                     destinationName,
-                    copyOptions);
-                transaction.Commit();
+                    copyOptions,
+                    out IReadOnlyList<string> warnings);
+                if (transaction.Commit() != TransactionStatus.Committed)
+                {
+                    throw new InvalidOperationException(
+                        "Revit cancelled the drafting-view import because some source content could not be pasted safely.");
+                }
+                if (warnings.Count > 0)
+                {
+                    destinationName += $" ({string.Join(" ", warnings)})";
+                }
                 destinationName += conflictHandler.GetUserMessage();
             }
 

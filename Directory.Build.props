@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2025</RevitVersion>
+    <RevitRuntime Condition="'$(RevitRuntime)' == '' and ('$(RevitVersion)' == '2023' or '$(RevitVersion)' == '2024')">net48</RevitRuntime>
+    <RevitRuntime Condition="'$(RevitRuntime)' == '' and ('$(RevitVersion)' == '2025' or '$(RevitVersion)' == '2026')">net8</RevitRuntime>
+    <RevitRuntime Condition="'$(RevitRuntime)' == '' and '$(RevitVersion)' == '2027'">net10</RevitRuntime>
+    <RevitBuildTarget>Revit$(RevitVersion)-$(RevitRuntime)</RevitBuildTarget>
+
+    <!-- NuGet and WPF both generate files here, so each Revit runtime needs its own path. -->
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)$(RevitBuildTarget)\</MSBuildProjectExtensionsPath>
+    <IntermediateOutputPath>$(MSBuildProjectExtensionsPath)$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+</Project>

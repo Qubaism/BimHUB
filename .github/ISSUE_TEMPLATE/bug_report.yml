@@ -1,0 +1,92 @@
+name: Bug report
+description: Report a reproducible problem in BimHUB.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve BimHUB.
+
+        Do not upload confidential Revit projects, families, library paths, screenshots, or company information. Use a safe sample file or remove sensitive information before attaching anything.
+
+  - type: dropdown
+    id: revit-version
+    attributes:
+      label: Revit version
+      description: Which Revit version was running when the problem occurred?
+      options:
+        - Revit 2023
+        - Revit 2024
+        - Revit 2025
+        - Revit 2026
+        - Revit 2027
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: bimhub-version
+    attributes:
+      label: BimHUB version
+      description: Find this in the downloaded package or GitHub release name.
+      placeholder: 0.2.0-alpha.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: installation-method
+    attributes:
+      label: Installation method
+      options:
+        - Windows installer
+        - Manual or development deployment
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem and where it occurred in BimHUB.
+      placeholder: Explain the problem clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the shortest sequence that reproduces the problem.
+      placeholder: |
+        1. Open...
+        2. Select...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      placeholder: Describe what you expected BimHUB to do.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Screenshots or additional information
+      description: Add non-confidential screenshots, error messages, or other useful details.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues before creating this report.
+          required: true
+        - label: I removed confidential or company information from this report and its attachments.
+          required: true

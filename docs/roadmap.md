@@ -6,8 +6,8 @@ BimHUB will be developed in small, reviewable stages. Priorities may change as w
 
 The current development build provides the main product foundation:
 
-- Revit add-in projects for .NET Framework 4.8 and .NET 8
-- Version-specific builds for Revit 2023 through Revit 2026
+- Revit add-in projects for .NET Framework 4.8, .NET 8, and .NET 10
+- Version- and runtime-specific builds for Revit 2023 through Revit 2027
 - QBTools ribbon panel and BimHUB command
 - Dockable library panel
 - Multiple family and details library locations
@@ -21,16 +21,18 @@ The current development build provides the main product foundation:
 
 ## Compatibility Validation
 
-- Hands-on workflow testing completed in Revit 2023
-- Hands-on workflow testing completed in Revit 2024
-- Hands-on workflow testing completed in Revit 2025
-- Hands-on workflow testing completed in Revit 2026
+- Previous hands-on workflow testing completed in Revit 2023 through Revit 2026
+- Current Revit 2024, Revit 2025.4, Revit 2026.5, and Revit 2027 targets build and pass automated tests
+- Live workflow retesting is required for the refreshed compatibility builds
 - Continue cross-version regression and stability testing
-- Build and test Revit 2027 after its matching Revit API is available locally
+- Build and test Revit 2025.5 on a matching installation
+- Rebuild the Revit 2023 and pre-2026.5 targets with their matching API references
 - Confirm family, drafting-view, and drafting-sheet behavior in every supported version
 
 ## Product Stabilization
 
+- Drafting-view copy now skips grouped, callout, cross-view, and individually unsupported elements instead of displaying a blocking Revit paste error; code and builds are verified, live Revit retest pending
+- Drafting-sheet import now activates the completed sheet and closes only the drafting views opened during that import; code and builds are verified, live Revit retest pending
 - Test large local and shared network libraries
 - Improve error reporting for unavailable or incompatible content
 - Validate background indexing and cancellation during long operations

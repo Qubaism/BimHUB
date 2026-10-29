@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Download BimHUB
+    url: https://github.com/Qubaism/BimHUB/releases
+    about: Download the latest installer package from GitHub Releases.

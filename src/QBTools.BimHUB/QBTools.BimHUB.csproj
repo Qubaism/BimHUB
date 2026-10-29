@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework Condition="'$(RevitVersion)' == '2023' or '$(RevitVersion)' == '2024'">net48</TargetFramework>
-    <TargetFramework Condition="'$(RevitVersion)' != '2023' and '$(RevitVersion)' != '2024'">net8.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(RevitRuntime)' == 'net48'">net48</TargetFramework>
+    <TargetFramework Condition="'$(RevitRuntime)' == 'net8'">net8.0-windows</TargetFramework>
+    <TargetFramework Condition="'$(RevitRuntime)' == 'net10'">net10.0-windows</TargetFramework>
+    <Net48ReferenceAssembliesRoot Condition="'$(TargetFramework)' == 'net48' and '$(NuGetPackageRoot)' != ''">$(NuGetPackageRoot)microsoft.netframework.referenceassemblies.net48\1.0.3\build\</Net48ReferenceAssembliesRoot>
+    <Net48ReferenceAssembliesRoot Condition="'$(TargetFramework)' == 'net48' and '$(Net48ReferenceAssembliesRoot)' == ''">$(UserProfile)\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\</Net48ReferenceAssembliesRoot>
+    <TargetFrameworkRootPath Condition="'$(TargetFramework)' == 'net48' and Exists('$(Net48ReferenceAssembliesRoot).NETFramework\v4.8\mscorlib.dll')">$(Net48ReferenceAssembliesRoot)</TargetFrameworkRootPath>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,10 +15,9 @@
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>QBTools.BimHUB</AssemblyName>
     <RootNamespace>QBTools.BimHUB</RootNamespace>
-    <RevitVersion Condition="'$(RevitVersion)' == ''">2025</RevitVersion>
-    <RevitInstallDirectory>C:\Program Files\Autodesk\Revit $(RevitVersion)</RevitInstallDirectory>
-    <OutputPath>bin\$(Configuration)\Revit$(RevitVersion)\</OutputPath>
-    <IntermediateOutputPath>obj\Revit$(RevitVersion)\$(Configuration)\</IntermediateOutputPath>
+    <RevitInstallDirectory Condition="'$(RevitInstallDirectory)' == ''">C:\Program Files\Autodesk\Revit $(RevitVersion)</RevitInstallDirectory>
+    <RevitApiDirectory Condition="'$(RevitApiDirectory)' == ''">$(RevitInstallDirectory)</RevitApiDirectory>
+    <OutputPath>bin\$(Configuration)\$(RevitBuildTarget)\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -37,7 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0">
+    <PackageReference Include="System.Drawing.Common"
+                      Version="8.0.0"
+                      Condition="'$(TargetFramework)' == 'net8.0-windows'">
       <IncludeAssets>compile</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -49,11 +54,11 @@
                       Version="8.0.5"
                       Condition="'$(TargetFramework)' == 'net48'" />
     <Reference Include="RevitAPI">
-      <HintPath>$(RevitInstallDirectory)\RevitAPI.dll</HintPath>
+      <HintPath>$(RevitApiDirectory)\RevitAPI.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="RevitAPIUI">
-      <HintPath>$(RevitInstallDirectory)\RevitAPIUI.dll</HintPath>
+      <HintPath>$(RevitApiDirectory)\RevitAPIUI.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
@@ -63,8 +68,20 @@
       Condition="'$(RevitVersion)' != '2023' and '$(RevitVersion)' != '2024' and '$(RevitVersion)' != '2025' and '$(RevitVersion)' != '2026' and '$(RevitVersion)' != '2027'"
       Text="RevitVersion must be between 2023 and 2027." />
     <Error
-      Condition="!Exists('$(RevitInstallDirectory)\RevitAPI.dll') or !Exists('$(RevitInstallDirectory)\RevitAPIUI.dll')"
-      Text="Revit $(RevitVersion) API assemblies were not found in $(RevitInstallDirectory)." />
+      Condition="'$(RevitRuntime)' != 'net48' and '$(RevitRuntime)' != 'net8' and '$(RevitRuntime)' != 'net10'"
+      Text="RevitRuntime must be net48, net8, or net10." />
+    <Error
+      Condition="('$(RevitVersion)' == '2023' or '$(RevitVersion)' == '2024') and '$(RevitRuntime)' != 'net48'"
+      Text="Revit $(RevitVersion) must be built with RevitRuntime=net48." />
+    <Error
+      Condition="('$(RevitVersion)' == '2025' or '$(RevitVersion)' == '2026') and '$(RevitRuntime)' != 'net8' and '$(RevitRuntime)' != 'net10'"
+      Text="Revit $(RevitVersion) must be built with RevitRuntime=net8 or net10." />
+    <Error
+      Condition="'$(RevitVersion)' == '2027' and '$(RevitRuntime)' != 'net10'"
+      Text="Revit 2027 must be built with RevitRuntime=net10." />
+    <Error
+      Condition="!Exists('$(RevitApiDirectory)\RevitAPI.dll') or !Exists('$(RevitApiDirectory)\RevitAPIUI.dll')"
+      Text="Revit $(RevitVersion) $(RevitRuntime) API assemblies were not found in $(RevitApiDirectory)." />
   </Target>
 
 </Project>

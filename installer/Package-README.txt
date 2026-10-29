@@ -21,7 +21,10 @@ INSTALLATION
 5. Start Revit and open BimHUB from the QBTools ribbon panel.
 
 Administrator access is not required. The installer installs BimHUB only for
-the current Windows user and does not overwrite unrelated Revit add-ins.
+the current Windows user and does not overwrite unrelated Revit add-ins. It
+supports compatible Revit 2023 through Revit 2027 installations. For Revit
+2025 and Revit 2026, the installer detects the installed build and selects the
+matching .NET 8 or .NET 10 payload automatically.
 
 REPAIR AND UPDATE
 -----------------

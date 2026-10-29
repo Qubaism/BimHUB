@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
 using QBTools.BimHUB.Models;
 using QBTools.BimHUB.Services;
 using System.Collections.Concurrent;
@@ -96,10 +97,13 @@ public sealed class ImportDraftingSheetExternalEventHandler : IExternalEventHand
 
             ViewSheet destinationSheet;
             SheetAnnotationCopyResult annotationResult;
+            var importedDraftingViewIds = new HashSet<ElementId>();
+            var importWarnings = new List<string>();
             var conflictHandler = new DuplicateTypeConflictHandler();
             using (var transaction = new Transaction(targetDocument, "Import drafting sheet from BimHUB"))
             {
                 transaction.Start();
+                ImportFailureHandling.ApplyQuietRollback(transaction);
                 if (!titleBlockType.IsActive)
                 {
                     titleBlockType.Activate();
@@ -125,7 +129,13 @@ public sealed class ImportDraftingSheetExternalEventHandler : IExternalEventHand
                         sourceView,
                         targetDocument,
                         GetUniqueViewName(targetDocument, sourceView.Name),
-                        copyOptions);
+                        copyOptions,
+                        out IReadOnlyList<string> viewWarnings);
+                    importedDraftingViewIds.Add(destinationView.Id);
+                    foreach (string warning in viewWarnings)
+                    {
+                        importWarnings.Add($"{sourceView.Name}: {warning}");
+                    }
 
                     targetDocument.Regenerate();
                     if (!Viewport.CanAddViewToSheet(
@@ -185,16 +195,34 @@ public sealed class ImportDraftingSheetExternalEventHandler : IExternalEventHand
                         $"Revit did not retain source sheet number '{sourceSheetNumber}'. The import was cancelled.");
                 }
 
-                transaction.Commit();
+                if (transaction.Commit() != TransactionStatus.Committed)
+                {
+                    throw new InvalidOperationException(
+                        "Revit cancelled the drafting-sheet import because some source content could not be pasted safely.");
+                }
             }
 
-            targetUiDocument.ActiveView = destinationSheet;
+            ActivateImportedSheetAndCloseDraftingViews(
+                targetUiDocument,
+                destinationSheet,
+                importedDraftingViewIds);
+            ScheduleImportedSheetActivationCleanup(
+                targetDocument,
+                application,
+                destinationSheet.Id,
+                importedDraftingViewIds);
             string message = $"Imported {destinationSheet.SheetNumber} - {destinationSheet.Name}";
             if (annotationResult.FailedCount > 0)
             {
                 message += $". {annotationResult.FailedCount} unsupported sheet annotation"
                     + (annotationResult.FailedCount == 1 ? " was" : "s were")
                     + " skipped.";
+            }
+            if (importWarnings.Count > 0)
+            {
+                message += $" {importWarnings.Count} drafting-view warning"
+                    + (importWarnings.Count == 1 ? " was" : "s were")
+                    + " recorded for unsupported source content.";
             }
             message += conflictHandler.GetUserMessage();
             Complete(item, true, message);
@@ -210,6 +238,98 @@ public sealed class ImportDraftingSheetExternalEventHandler : IExternalEventHand
     }
 
     public string GetName() => "Import a same-version drafting sheet from BimHUB";
+
+    private static void ScheduleImportedSheetActivationCleanup(
+        Document targetDocument,
+        UIApplication application,
+        ElementId sheetId,
+        ICollection<ElementId> importedDraftingViewIds)
+    {
+        var draftingIds = new HashSet<ElementId>(importedDraftingViewIds);
+        int attemptsRemaining = 8;
+        EventHandler<IdlingEventArgs>? onIdle = null;
+        onIdle = (_, _) =>
+        {
+            attemptsRemaining--;
+            bool stillOpen = false;
+            try
+            {
+                UIDocument? uiDocument = application.ActiveUIDocument;
+                if (uiDocument is null || !ReferenceEquals(uiDocument.Document, targetDocument))
+                {
+                    return;
+                }
+
+                ViewSheet? sheet = targetDocument.GetElement(sheetId) as ViewSheet;
+                stillOpen = ActivateImportedSheetAndCloseDraftingViews(
+                    uiDocument,
+                    sheet,
+                    draftingIds);
+            }
+            catch (Exception)
+            {
+                stillOpen = false;
+            }
+            finally
+            {
+                if (!stillOpen || attemptsRemaining <= 0)
+                {
+                    application.Idling -= onIdle;
+                }
+            }
+        };
+
+        application.Idling += onIdle;
+    }
+
+    private static bool ActivateImportedSheetAndCloseDraftingViews(
+        UIDocument uiDocument,
+        ViewSheet? sheet,
+        ICollection<ElementId> importedDraftingViewIds)
+    {
+        if (sheet is null || !sheet.IsValidObject) return false;
+
+        try
+        {
+            uiDocument.RequestViewChange(sheet);
+        }
+        catch (Exception)
+        {
+            try
+            {
+                uiDocument.ActiveView = sheet;
+            }
+            catch (Exception)
+            {
+                // The sheet remains imported even when Revit delays activation.
+            }
+        }
+
+        if (importedDraftingViewIds.Count == 0) return false;
+
+        bool stillOpen = false;
+        foreach (UIView openView in uiDocument.GetOpenUIViews().ToList())
+        {
+            if (!importedDraftingViewIds.Contains(openView.ViewId)) continue;
+            if (uiDocument.Document.ActiveView?.Id == openView.ViewId)
+            {
+                stillOpen = true;
+                continue;
+            }
+
+            try
+            {
+                openView.Close();
+            }
+            catch (Exception)
+            {
+                stillOpen = true;
+            }
+        }
+
+        return stillOpen || uiDocument.GetOpenUIViews()
+            .Any(openView => importedDraftingViewIds.Contains(openView.ViewId));
+    }
 
     private static SheetAnnotationCopyResult CopySheetAnnotations(
         Document sourceDocument,
